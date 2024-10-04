@@ -1,0 +1,16 @@
+Metadata-Version: 2.1
+Name: skyer_llm
+Version: 0.1.0
+Summary: A simple package called skyer for building a Large Language Model from scratch.
+Home-page: https://github.com/tunglinwood/skyer
+Author: tunglinwood
+Author-email: tomwu.tunglin@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# skyer: 用最简单的方式训练一个大语言模型
+
