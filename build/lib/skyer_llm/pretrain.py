@@ -1,41 +1,57 @@
-import argparse
 import deepspeed
 import torch
 from torch.utils.tensorboard import SummaryWriter
-from data import *
-from model import *
+from skyer_llm.data import SkyDataset
+from skyer_llm.model import Skyer
 from torch import nn
-from data import MyDataset
 import warnings
 
 warnings.filterwarnings('ignore')
 
-def parse_arguments():
-    parser = argparse.ArgumentParser(description="skyer pretrain")
-    parser.add_argument('--local_rank', type=int, default=-1)
-    parser.add_argument('--data_file', type=str)
-    parser.add_argument('--ss', type=int)
-    parser = deepspeed.add_config_arguments(parser)
-    args = parser.parse_args()
-    return args
-
 class Trainer:
-
-    def __init__(self):
+    def __init__(self, 
+                 data_file, 
+                 ss, 
+                 seq_len,
+                 num_layers,
+                 input_dim,
+                 hide_dim,
+                 n_q_heads,
+                 n_kv_heads,
+                 max_len,
+                 num_vocs,):
+        
+        self.args = {
+            'local_rank': -1, 
+            'data_file': data_file,
+            'ss': ss,
+            'seq_len': seq_len,
+            'num_layers': num_layers,
+            'input_dim': input_dim,
+            'hide_dim': hide_dim,
+            'n_q_heads': n_q_heads,
+            'n_kv_heads': n_kv_heads,
+            'max_len': max_len,
+            'num_vocs': num_vocs
+        }
 
         deepspeed.init_distributed()
-        self.args = parse_arguments()
-
         _rank = deepspeed.comm.get_rank()
         if _rank == 0:
             self.log = SummaryWriter("runs")
 
-        self.model = Skyer()
+        self.model = Skyer(self.args['num_layers'],
+                           self.args['input_dim'],
+                           self.args['hide_dim'],
+                           self.args['n_q_heads'],
+                           self.args['n_kv_heads'],
+                           self.args['max_len'],
+                           self.args['num_vocs'])
 
         self.engine, self.opt, self.training_dataloader, self.lr_scheduler = deepspeed.initialize(
             args=self.args,
             model=self.model,
-            training_data=MyDataset(f"{self.args.data_file}", 512),
+            training_data=SkyDataset(self.args['data_file'], self.args['seq_len']),
             model_parameters=self.model.parameters(),
             config="./deepspeed_config.json"
         )
@@ -43,12 +59,10 @@ class Trainer:
         self.loss_fn = nn.CrossEntropyLoss(ignore_index=0)
 
     def __call__(self):
-
         _rank = deepspeed.comm.get_rank()
-
         self.engine.train()
 
-        _, client_sd = self.engine.load_checkpoint(f"save")
+        _, client_sd = self.engine.load_checkpoint("save")
         if client_sd is None:
             client_sd = {"step": 0}
 
@@ -70,14 +84,9 @@ class Trainer:
 
             _step = client_sd['step']
             if _rank == 0 and _i % 100 == 0:
-                self.log.add_scalar(f"loss", _loss, _step)
+                self.log.add_scalar("loss", _loss, _step)
             client_sd['step'] += 1
 
-        ss = self.args.ss
-        self.engine.save_checkpoint(f"save", tag=f"llm_{ss}",
-                                    client_state={"step": client_sd['step']})
+        ss = self.args['ss']
+        self.engine.save_checkpoint("save", tag=f"llm_{ss}", client_state={"step": client_sd['step']})
 
-
-if __name__ == '__main__':
-    train = Trainer()
-    train()

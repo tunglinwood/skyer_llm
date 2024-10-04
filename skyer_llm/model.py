@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from torch.nn import init
-from transformer import TransformerDecoder
+from skyer_llm.transformer import TransformerDecoder
 
 
 class Skyer(nn.Module):
@@ -57,6 +57,3 @@ class Skyer(nn.Module):
             with torch.no_grad():
                 return self._forward(ids, start_pos)
 
-
-if __name__ == "__main__":
-    skyer = Skyer()

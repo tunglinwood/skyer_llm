@@ -1,11 +1,11 @@
 import torch
 import sentencepiece as spm
-from model import Skyer
+from skyer_llm.model import Skyer
 from torch.distributions.categorical import Categorical
 
 
 
-class Eval:
+class Inference:
 
     def __init__(self,
                  topk=4,
@@ -63,7 +63,7 @@ class Eval:
     
 if __name__ == '__main__':
 
-    env=Eval()
+    env=Inference()
 
     
     voc = env("我爱天安门")
