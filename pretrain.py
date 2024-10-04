@@ -10,8 +10,6 @@ import warnings
 
 warnings.filterwarnings('ignore')
 
-
-
 def parse_arguments():
     parser = argparse.ArgumentParser(description="skyer pretrain")
     parser.add_argument('--local_rank', type=int, default=-1)
@@ -20,7 +18,6 @@ def parse_arguments():
     parser = deepspeed.add_config_arguments(parser)
     args = parser.parse_args()
     return args
-
 
 class Trainer:
 
@@ -76,7 +73,6 @@ class Trainer:
                 self.log.add_scalar(f"loss", _loss, _step)
             client_sd['step'] += 1
 
-        # hour = datetime.now().hour
         ss = self.args.ss
         self.engine.save_checkpoint(f"save", tag=f"llm_{ss}",
                                     client_state={"step": client_sd['step']})
