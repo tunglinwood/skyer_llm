@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="skyer_llm",
-    version="0.1.0",
+    version="0.1.1",
     author="tunglinwood",
     author_email="tomwu.tunglin@gmail.com",
     description="A simple package called skyer for building a Large Language Model from scratch.",

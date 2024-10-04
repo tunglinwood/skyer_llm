@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: skyer_llm
-Version: 0.1.0
+Version: 0.1.1
 Summary: A simple package called skyer for building a Large Language Model from scratch.
 Home-page: https://github.com/tunglinwood/skyer
 Author: tunglinwood
