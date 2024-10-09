@@ -1,9 +1,9 @@
 from .data import SkyDataset
-from .preprocess import Preprocess
-from .transformer import TransformerDecoder
+from .preprocess import SkyerPreprocess
+from .transformer import SkyerModuleList
 from .model import Skyer
-from .pretrain import Trainer
+from .deepspeed_pretrain import Trainer
 from .inference import Inference
 
 
-__all__ = ["SkyDataset", "Preprocess", "TransformerDecoder", "Skyer", "Trainer", "Inference"]
+__all__ = ["SkyDataset", "SkyerPreprocess", "SkyerModuleList", "Skyer", "Trainer", "Inference"]

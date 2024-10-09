@@ -1,28 +1,27 @@
 import torch
 from torch import nn
 from torch.nn import init
-from skyer_llm.transformer import TransformerDecoder
-
+from skyer_llm.transformer import SkyerModuleList
 
 class Skyer(nn.Module):
 
     def __init__(self,
-                 num_layers=20,
-                 input_dim=2048,
-                 hide_dim=1536,
-                 n_q_heads=24,
-                 n_kv_heads=12,
-                 max_len=1024,
-                 num_vocs=30000,
-                 cache_max_batch_size=None,
-                 cache_max_seq_len=None):
+                 num_layers: int,
+                 input_dim: int,
+                 hide_dim: int,
+                 n_q_heads: int,
+                 n_kv_heads: int,
+                 max_len: int,
+                 num_vocs: int,
+                 cache_max_batch_size: int = None,
+                 cache_max_seq_len: int = None):
         super().__init__()
 
         self._cache_max_batch_size = cache_max_batch_size
 
-        self._emb = nn.Embedding(num_vocs, input_dim)
+        self.embed_tokens = nn.Embedding(num_vocs, input_dim)
 
-        self._tf_layer = TransformerDecoder(
+        self.layers = SkyerModuleList(
             num_layers=num_layers,
             input_dim=input_dim,
             hide_dim=hide_dim,
@@ -36,24 +35,23 @@ class Skyer(nn.Module):
         if cache_max_batch_size is not None:
             self.apply(self._init_weight)
 
-    def _init_weight(self,m):
+    def _init_weight(self, m):
         if isinstance(m, nn.Linear):
             init.xavier_uniform_(m.weight)
             if m.bias is not None:
                 init.zeros_(m.bias)
 
-        elif isinstance(m,nn.Embedding):
+        elif isinstance(m, nn.Embedding):
             init.xavier_uniform_(m.weight)
 
     def _forward(self, ids, start_pos):
-        _tokens = self._emb(ids)
-        _features = self._tf_layer(_tokens, start_pos)
-        return _features@self._emb.weight.T
+        _tokens = self.embed_tokens(ids)    
+        _features = self.layers(_tokens, start_pos)
+        return _features@self.embed_tokens.weight.T
 
     def forward(self, ids, start_pos=0):
-        if self._cache_max_batch_size is None :
+        if self._cache_max_batch_size is None:
             return self._forward(ids, start_pos)
         else:
             with torch.no_grad():
                 return self._forward(ids, start_pos)
-

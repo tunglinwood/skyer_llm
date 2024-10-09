@@ -5,7 +5,7 @@ import os
 import re
 from tqdm import tqdm
 
-class Preprocess:
+class SkyerPreprocess:
 
     def __init__(self,tokenizer,dst_dir):
         self._spm = sp.SentencePieceProcessor()

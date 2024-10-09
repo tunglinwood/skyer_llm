@@ -60,11 +60,3 @@ class Inference:
         return torch.exp(_o/temp)/(torch.exp(_o/temp).sum(-1)+1e-5)
     
 
-    
-if __name__ == '__main__':
-
-    env=Inference()
-
-    
-    voc = env("我爱天安门")
-    print(voc)
