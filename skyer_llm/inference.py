@@ -24,10 +24,10 @@ class Inference:
                             cache_max_batch_size=1,
                             cache_max_seq_len=1024).cuda()
         self._skyer.eval()
-        self._skyer.load_state_dict(torch.load("/root/lanyun-fs/team2/team2_model/save/llm_115/mp_rank_00_model_states.pt"), strict=False)
+        self._skyer.load_state_dict(torch.load("/root/model_states.pt"), strict=False)
 
         self._spm = spm.SentencePieceProcessor()
-        self._spm.Load("/root/lanyun-fs/team2/team2_model/tokenizer.model")
+        self._spm.Load("/root/tokenizer.model")
 
     def __call__(self,prompt):
         _vocs = prompt
@@ -64,7 +64,5 @@ class Inference:
 if __name__ == '__main__':
 
     env=Inference()
-
-    
     voc = env("我爱天安门")
     print(voc)
