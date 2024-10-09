@@ -210,29 +210,3 @@ class TransformerDecoder(nn.Module):
             _x = _layer(_x, self.freq_cis, start_pos)
         return _x
 
-
-if __name__ == '__main__':
-    bn = 3
-    seq = 7
-    vec = 128
-    n_q_heads = 4
-    n_kv_heads = 2
-    n_layers = 2
-    max_len = seq*2
-
-    freq_cis = precompute_freqs_cis(vec//n_q_heads, max_len)
-
-    x = torch.randn(bn, seq, vec)
-
-
-    decoder = TransformerDecoder(
-        num_layers=n_layers,
-        input_dim=vec,
-        hide_dim=vec//2,
-        n_q_heads=n_q_heads,
-        n_kv_heads=n_kv_heads,
-        max_len=max_len,
-        cache_max_batch_size=None,
-        cache_max_seq_len=None
-
-    )
