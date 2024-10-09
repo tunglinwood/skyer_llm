@@ -9,7 +9,10 @@ class Inference:
 
     def __init__(self,
                  topk=4,
-                 temp=20):
+                 temp=20,
+                 model_path = "",
+                 tokenizer_path = "",
+                 ):
 
         self._topk = topk
         self._temp = temp
@@ -24,10 +27,10 @@ class Inference:
                             cache_max_batch_size=1,
                             cache_max_seq_len=1024).cuda()
         self._skyer.eval()
-        self._skyer.load_state_dict(torch.load("/root/lanyun-fs/team2/team2_model/save/llm_115/mp_rank_00_model_states.pt"), strict=False)
+        self._skyer.load_state_dict(torch.load(model_path), strict=False)
 
-        self._spm = spm.SentencePieceProcessor()
-        self._spm.Load("/root/lanyun-fs/team2/team2_model/tokenizer.model")
+        self._spm = spm.SentencePieceProcessor(tokenizer_path)
+        self._spm.Load()
 
     def __call__(self,prompt):
         _vocs = prompt
@@ -60,3 +63,13 @@ class Inference:
         return torch.exp(_o/temp)/(torch.exp(_o/temp).sum(-1)+1e-5)
     
 
+<<<<<<< HEAD
+=======
+    
+if __name__ == '__main__':
+    model_path = "out/model.pt"#model的路径
+    tokenizer_path = "out/tokenizer.model"#tokenizer的路径
+    env=Inference()
+    voc = env("我爱天安门")
+    print(voc)
+>>>>>>> 34dbad5c20e3af3ed25fa18d14e1e61f8dd02707
